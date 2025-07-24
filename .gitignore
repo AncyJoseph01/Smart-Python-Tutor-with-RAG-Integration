@@ -27,3 +27,6 @@ node_modules/
 .env
 dist/
 *.log
+
+*.pyc
+__pycache__/
