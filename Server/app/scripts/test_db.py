@@ -1,8 +1,8 @@
 import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from db.models import User, Base
-from core.config import settings
+from app.db.models import User, Base
+from app.core.config import settings
 from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -16,8 +16,8 @@ async def insert_test_data():
             await conn.run_sync(Base.metadata.create_all)
 
         async with AsyncSessionLocal() as session:
-            hashed_password = pwd_context.hash("hashedpassword123")
-            user = User(name="Tony Baby", email="Tony@example.com", password=hashed_password)
+            hashed_password = pwd_context.hash("1234")
+            user = User(name="Tony", email="Tony@example.com", password=hashed_password)
             session.add(user)
             await session.flush()
             await session.commit()
