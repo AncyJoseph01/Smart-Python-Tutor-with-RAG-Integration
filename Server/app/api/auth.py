@@ -28,7 +28,7 @@ async def get_db():
         pass  # No close() needed here
 
 @router.post("/register", response_model=UserOut)
-async def register(user: UserCreate, db: database = Depends(get_db)):
+async def register(user: UserCreate, db: database = Depends(get_db)): # type: ignore
     logger.info(f"Processing registration for email: {user.email}")
     # Lowercase email for uniqueness
     email = user.email.lower()
@@ -59,7 +59,7 @@ async def register(user: UserCreate, db: database = Depends(get_db)):
     return {"id": user_id, "name": user.name, "email": email}
 
 @router.post("/login")
-async def login(email: str, password: str, db: database = Depends(get_db)):
+async def login(email: str, password: str, db: database = Depends(get_db)): # type: ignore
     logger.info(f"Login attempt for email: {email}")
     email = email.lower()
     query = select(User).where(User.email == email)
