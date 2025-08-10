@@ -17,7 +17,7 @@ async def insert_test_data():
 
         async with AsyncSessionLocal() as session:
             hashed_password = pwd_context.hash("1234")
-            user = User(name="Tony", email="Tony@example.com", password=hashed_password)
+            user = User(name="Ancy", email="Ancy@example.com", password=hashed_password)
             session.add(user)
             await session.flush()
             await session.commit()
