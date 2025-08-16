@@ -11,3 +11,13 @@ certifi==2025.7.14
 charset-normalizer==3.4.2
 idna==3.10
 urllib3==2.2.3
+sqlalchemy==2.0.43
+databases==0.9.0
+pydantic_settings==2.10.1
+asyncpg==0.30.0
+pydantic[email]==2.0.0
+passlib==1.7.4
+google==3.0.0
+google_generativeai==0.8.5
+faiss_cpu==1.12.0
+bcrypt==4.3.0
