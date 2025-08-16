@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy import select
 from app.db.database import database
 from app.db.models import User
-from app.schemas.user import UserCreate, UserOut
+from app.schemas.user import UserCreate, UserOut, UserLogin
 from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -59,9 +59,10 @@ async def register(user: UserCreate, db: database = Depends(get_db)): # type: ig
     return {"id": user_id, "name": user.name, "email": email}
 
 @router.post("/login")
-async def login(email: str, password: str, db: database = Depends(get_db)): # type: ignore
+async def login(payload:UserLogin, db: database = Depends(get_db)): # type: ignore
+    email = payload.email.lower()
+    password = payload.password
     logger.info(f"Login attempt for email: {email}")
-    email = email.lower()
     query = select(User).where(User.email == email)
     user = await db.fetch_one(query)
 
@@ -75,4 +76,4 @@ async def login(email: str, password: str, db: database = Depends(get_db)): # ty
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     logger.info(f"Successful login for user: {user.name}")
-    return {"message": f"Welcome back, {user.name}!"}
+    return {"id": user.id}
