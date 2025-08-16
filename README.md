@@ -1,5 +1,5 @@
 # AJ-AI-Tutor
-
+.\venv_3.13\Scripts\Activate
 ### To Run the FastAPI Backend 
 `uvicorn app.main:app --reload`
 
