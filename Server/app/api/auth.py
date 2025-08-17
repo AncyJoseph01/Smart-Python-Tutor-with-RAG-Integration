@@ -76,4 +76,4 @@ async def login(payload:UserLogin, db: database = Depends(get_db)): # type: igno
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     logger.info(f"Successful login for user: {user.name}")
-    return {"id": user.id}
+    return {"id": user.id, "name": user.name}
