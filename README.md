@@ -10,7 +10,7 @@ npm run dev
 python -m app.scripts.create_tables
 python -m app.scripts.test_db
 
-# Build and start both containers 
+# Build and start both containers  - note for AJ - to try and automate the table creation into the container the next time.
 docker compose up --build
 docker compose build --no-cache
 
@@ -35,4 +35,26 @@ CREATE TABLE chat (
 );
 \dt
 \q
+docker compose up
+
+
+# to share the conatiner with someone
+docker push yourusername/ai-tutor:latest
+docker login
+
+docker pull yourusername/ai-tutor:latest
+create docker-compose.yml (insert the code)
+provide .env
+docker compose up
+
+
+# new
+docker tag ai-tutor-backend:latest ancy0501/ai-tutor:latest
+docker login
+docker push ancy0501/ai-tutor:latest
+
+# provide a smimple `docker-compose.yml` to the tester
+# provide `.env`
+
+docker pull ancy0501/ai-tutor:latest
 docker compose up
