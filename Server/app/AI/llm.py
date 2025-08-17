@@ -29,8 +29,8 @@ except Exception as e:
     raise
 
 # Absolute path to output folder
-OUTPUT_DIR = r"E:\Personal Project\AI Projects\AI-Tutor-APP-ME-and-Tony\AJ-AI-TUTOR\AJ-AI-Tutor\Server\app\output"
-
+# OUTPUT_DIR = r"E:\Personal Project\AI Projects\AI-Tutor-APP-ME-and-Tony\AJ-AI-TUTOR\AJ-AI-Tutor\Server\app\output"
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "/code/app/output")  
 # Load embedding model and RAG data
 try:
     embed_model = SentenceTransformer('all-MiniLM-L6-v2')
