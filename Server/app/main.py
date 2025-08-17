@@ -5,7 +5,14 @@ from app.api import auth, tutor
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
-app = FastAPI()
+app = FastAPI(
+    title="AI Tutor API",
+    description="API Documentation for AI Tutor Application",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
 
 app.add_middleware(
     CORSMiddleware,

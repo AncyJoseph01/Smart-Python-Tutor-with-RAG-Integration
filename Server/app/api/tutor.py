@@ -23,7 +23,8 @@ async def get_next_session_id(user_id: int) -> int:
     return (max_session_id or 0) + 1
 
 @router.post("/ask", response_model=TutorResponse)
-async def ask_tutor(request: TutorRequest, _=Depends(validate_user)):
+async def ask_tutor(request: TutorRequest):
+    await validate_user(request.user_id)
     try:
         # Reject chat_session_id: 0 explicitly
         if request.chat_session_id == 0:
