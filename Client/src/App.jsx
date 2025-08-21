@@ -1,13 +1,29 @@
-import { useState } from 'react'
-
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import PrivateRoute from "./components/PrivateRoute";
+import { AuthProvider } from "./context/AuthContext";
+import Login from "./components/Login";
+import Dashboard from "./components/Dashboard";
+import PageNotFound from "./components/PageNotFound";
+import Register from "./components/Register";
 
 function App() {
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold text-blue-600">AI Tutor Frontend</h1>
-    </div>
+    <>
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route element={<PrivateRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Route>
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </>
   );
 }
 
 export default App;
-
