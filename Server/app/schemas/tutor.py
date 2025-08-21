@@ -27,3 +27,11 @@ class TutorResponse(BaseModel):
 class ChatHistory(BaseModel):
     chat_session_id: int
     chats: List[TutorResponse]
+
+
+class ChatSessionInfo(BaseModel):
+    chat_session_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
