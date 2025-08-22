@@ -8,5 +8,6 @@ body {
 html,
 body,
 #root {
+  overflow-x: hidden !important;
   height: 100%;
 }
