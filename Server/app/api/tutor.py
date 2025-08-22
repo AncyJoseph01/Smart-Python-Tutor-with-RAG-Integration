@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy import insert, select, func
-from app.schemas.tutor import TutorRequest, TutorResponse, ChatHistory
+from app.schemas.tutor import TutorRequest, TutorResponse, ChatHistory, ChatSessionInfo
 from app.AI.llm import get_tutor_reply_with_rag
 from app.db.database import database
 from app.db.models import Chat, User
@@ -91,12 +91,28 @@ async def get_chat_history(user_id: int, chat_session_id: int, _=Depends(validat
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
-@router.get("/sessions/{user_id}", response_model=List[int])
+@router.get("/sessions/{user_id}", response_model=List[ChatSessionInfo])
 async def get_user_sessions(user_id: int, _=Depends(validate_user)):
     try:
-        query = select(Chat.chat_session_id).where(Chat.user_id == user_id).distinct()
+        # Fixed select statement syntax
+        query = (
+            select(
+                Chat.chat_session_id,
+                func.min(Chat.created_at).label('created_at')
+            )
+            .where(Chat.user_id == user_id)
+            .group_by(Chat.chat_session_id)
+            .order_by(Chat.chat_session_id.desc())
+        )
+        
         sessions = await database.fetch_all(query)
-        return [session.chat_session_id for session in sessions]
+        return [
+            ChatSessionInfo(
+                chat_session_id=session.chat_session_id,
+                created_at=session.created_at
+            ) 
+            for session in sessions
+        ]
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
