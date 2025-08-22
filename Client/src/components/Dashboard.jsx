@@ -26,28 +26,29 @@ import axios from "axios";
 
 function TypingIndicator() {
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-      <Box sx={{
-        width: 8, height: 8, bgcolor: "grey.500", borderRadius: "50%",
-        animation: "blink 1.4s infinite both"
-      }} />
-      <Box sx={{
-        width: 8, height: 8, bgcolor: "grey.500", borderRadius: "50%",
-        animation: "blink 1.4s infinite 0.2s both"
-      }} />
-      <Box sx={{
-        width: 8, height: 8, bgcolor: "grey.500", borderRadius: "50%",
-        animation: "blink 1.4s infinite 0.4s both"
-      }} />
-      <style>
-        {`@keyframes blink {
-            0%, 80%, 100% { opacity: 0; }
-            40% { opacity: 1; }
-        }`}
-      </style>
+    <Box sx={{ display: "flex", gap: 0.5, alignItems: "center", p: 1 }}>
+      {[...Array(3)].map((_, i) => (
+        <Box
+          key={i}
+          sx={{
+            width: 8,
+            height: 8,
+            bgcolor: "grey.500",
+            borderRadius: "50%",
+            animation: `typing 1s infinite ${i * 0.2}s`,
+          }}
+        />
+      ))}
+      <style>{`
+        @keyframes typing {
+          0%, 80%, 100% { transform: scale(0); }
+          40% { transform: scale(1); }
+        }
+      `}</style>
     </Box>
   );
 }
+
 
 
 export default function Dashboard() {
@@ -254,37 +255,29 @@ export default function Dashboard() {
               }}
             >
               {messages.map((msg, idx) => (
-                <Box
-                  key={idx}
+              <Box
+                key={idx}
+                sx={{
+                  display: "flex",
+                  justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
+                  mb: 2,
+                }}
+              >
+                <Paper
+                  elevation={1}
                   sx={{
-                    display: "flex",
-                    justifyContent:
-                      msg.sender === "user" ? "flex-end" : "flex-start",
-                    mb: 2,
+                    p: 2,
+                    maxWidth: "80%",
+                    borderRadius: 3,
+                    bgcolor: msg.sender === "user" ? "primary.main" : "background.paper",
+                    color: msg.sender === "user" ? "white" : "text.primary",
                   }}
                 >
-                  <Paper
-                    elevation={1}
-                    sx={{
-                      p: 2,
-                      maxWidth: "80%",
-                      whiteSpace: "pre-wrap",
-                      bgcolor:
-                        msg.sender === "user"
-                          ? "primary.main"
-                          : "background.paper",
-                      color: msg.sender === "user" ? "white" : "text.primary",
-                      borderRadius: 3,
-                    }}
-                  >
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                    >
-                      {msg.text}
-                    </ReactMarkdown>
-                  </Paper>
-                </Box>
-              ))}
+                  {msg.isTyping ? <TypingIndicator /> : <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>}
+                </Paper>
+              </Box>
+            ))}
+
               <div ref={messagesEndRef} />
             </Box>
 
