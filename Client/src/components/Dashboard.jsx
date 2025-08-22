@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import "github-markdown-css/github-markdown-light.css";
 import {
   AppBar,
   Box,
@@ -20,6 +23,32 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import ChatIcon from "@mui/icons-material/Chat";
 import axios from "axios";
+
+function TypingIndicator() {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <Box sx={{
+        width: 8, height: 8, bgcolor: "grey.500", borderRadius: "50%",
+        animation: "blink 1.4s infinite both"
+      }} />
+      <Box sx={{
+        width: 8, height: 8, bgcolor: "grey.500", borderRadius: "50%",
+        animation: "blink 1.4s infinite 0.2s both"
+      }} />
+      <Box sx={{
+        width: 8, height: 8, bgcolor: "grey.500", borderRadius: "50%",
+        animation: "blink 1.4s infinite 0.4s both"
+      }} />
+      <style>
+        {`@keyframes blink {
+            0%, 80%, 100% { opacity: 0; }
+            40% { opacity: 1; }
+        }`}
+      </style>
+    </Box>
+  );
+}
+
 
 export default function Dashboard() {
   const { logout, user } = useAuth();
@@ -90,6 +119,7 @@ export default function Dashboard() {
 
     // Add user message
     setMessages((prev) => [...prev, { sender: "user", text: input }]);
+    setMessages((prev) => [...prev, { sender: "bot", isTyping: true }]);
 
     try {
       const requestBody = {
@@ -103,27 +133,35 @@ export default function Dashboard() {
       );
 
       // Add bot response from API
-      setMessages((prev) => [
-        ...prev,
-        {
+      setMessages((prev) => {
+      const newMessages = [...prev];
+      const typingIndex = newMessages.findIndex(m => m.isTyping);
+      if (typingIndex !== -1) {
+        newMessages[typingIndex] = {
           sender: "bot",
-          text:
-            response.data.answer || "Sorry, I couldn't process that request.",
-        },
-      ]);
-    } catch (error) {
-      console.error("Error:", error);
-      setMessages((prev) => [
-        ...prev,
-        {
+          text: response.data.answer || "Sorry, I couldn't process that request."
+        };
+      } else {
+        newMessages.push({
           sender: "bot",
-          text: "Sorry, there was an error processing your request.",
-        },
-      ]);
-    }
+          text: response.data.answer || "Sorry, I couldn't process that request."
+        });
+      }
+      return newMessages;
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: "bot",
+        text: "Sorry, there was an error processing your request.",
+      },
+    ]);
+  }
 
-    setInput("");
-  };
+  setInput("");
+};
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -239,7 +277,11 @@ export default function Dashboard() {
                       borderRadius: 3,
                     }}
                   >
-                    <Typography variant="body1">{msg.text}</Typography>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                    >
+                      {msg.text}
+                    </ReactMarkdown>
                   </Paper>
                 </Box>
               ))}

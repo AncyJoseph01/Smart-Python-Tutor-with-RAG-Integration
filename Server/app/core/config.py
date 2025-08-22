@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:1234@db:5432/AJDB"
+    DATABASE_URL: str 
     GEMINI_API_KEY: str
 
     class Config:
