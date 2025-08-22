@@ -271,10 +271,28 @@ export default function Dashboard() {
                     borderRadius: 3,
                     bgcolor: msg.sender === "user" ? "primary.main" : "background.paper",
                     color: msg.sender === "user" ? "white" : "text.primary",
+                    overflowX: "auto",   // 👈 restrict horizontal scroll to this bubble only
                   }}
                 >
-                  {msg.isTyping ? <TypingIndicator /> : <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.text}</ReactMarkdown>}
+                  {msg.isTyping ? (
+                    <TypingIndicator />
+                  ) : (
+                    <Box
+                      sx={{
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                        overflowX: "auto",   // 👈 ensures code/table scrolls, not page
+                        maxWidth: "100%",
+                      }}
+                    >
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {msg.text}
+                      </ReactMarkdown>
+                    </Box>
+                  )}
                 </Paper>
+
+
               </Box>
             ))}
 
