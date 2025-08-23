@@ -220,8 +220,15 @@ export default function Dashboard() {
                   <ChatIcon />
                 </ListItemIcon>
                 <ListItemText
-                  primary={`Chat ${chat.chat_session_id}`}
+                  primary={`${chat.chat_query}`}
                   secondary={new Date(chat.created_at).toLocaleDateString()}
+                  primaryTypographyProps={{
+                    sx: {
+                      textWrap: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    },
+                  }}
                 />
               </ListItem>
             ))}
