@@ -4,10 +4,11 @@ import { useState, useRef, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "github-markdown-css/github-markdown-light.css";
+import SendIcon from "@mui/icons-material/Send";
+
 import {
   AppBar,
   Box,
-  IconButton,
   Paper,
   Button,
   TextField,
@@ -49,8 +50,6 @@ function TypingIndicator() {
   );
 }
 
-
-
 export default function Dashboard() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
@@ -61,13 +60,15 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchChatSessions = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/tutor/sessions/${user.userId}`);
+        const response = await axios.get(
+          `http://localhost:8000/tutor/sessions/${user.userId}`
+        );
         setChatHistory(response.data);
       } catch (error) {
-        console.error('Error fetching chat sessions:', error);
+        console.error("Error fetching chat sessions:", error);
       }
     };
-    
+
     if (user.userId) {
       fetchChatSessions();
     }
@@ -89,16 +90,18 @@ export default function Dashboard() {
       const response = await axios.get(
         `http://localhost:8000/tutor/history/${user.userId}/${chatId}`
       );
-      
+
       // Transform the chat history into our message format
-      const formattedMessages = response.data.chats.map(chat => ([
-        { sender: "user", text: chat.query },
-        { sender: "bot", text: chat.answer }
-      ])).flat();
-      
+      const formattedMessages = response.data.chats
+        .map((chat) => [
+          { sender: "user", text: chat.query },
+          { sender: "bot", text: chat.answer },
+        ])
+        .flat();
+
       setMessages(formattedMessages);
     } catch (error) {
-      console.error('Error fetching chat history:', error);
+      console.error("Error fetching chat history:", error);
     }
   };
 
@@ -126,43 +129,58 @@ export default function Dashboard() {
       const requestBody = {
         query: input,
         user_id: user.userId,
-        chat_session_id: currentChatId
+        chat_session_id: currentChatId,
       };
+
       const response = await axios.post(
         "http://localhost:8000/tutor/ask",
         requestBody
       );
 
+      // Update currentChatId if it was a new chat (null)
+      if (!currentChatId) {
+        setCurrentChatId(response.data.chat_session_id);
+
+        // Update chat history with new session
+        setChatHistory((prev) => [
+          {
+            chat_session_id: response.data.chat_session_id,
+            created_at: new Date().toISOString(),
+          },
+          ...prev,
+        ]);
+      }
+
       // Add bot response from API
       setMessages((prev) => {
-      const newMessages = [...prev];
-      const typingIndex = newMessages.findIndex(m => m.isTyping);
-      if (typingIndex !== -1) {
-        newMessages[typingIndex] = {
-          sender: "bot",
-          text: response.data.answer || "Sorry, I couldn't process that request."
-        };
-      } else {
-        newMessages.push({
-          sender: "bot",
-          text: response.data.answer || "Sorry, I couldn't process that request."
-        });
-      }
-      return newMessages;
-    });
-  } catch (error) {
-    console.error("Error:", error);
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: "bot",
-        text: "Sorry, there was an error processing your request.",
-      },
-    ]);
-  }
+        const newMessages = [...prev];
+        const typingIndex = newMessages.findIndex((m) => m.isTyping);
+        if (typingIndex !== -1) {
+          newMessages[typingIndex] = {
+            sender: "bot",
+            text:
+              response.data.answer || "Sorry, I couldn't process that request.",
+          };
+        }
+        return newMessages;
+      });
+    } catch (error) {
+      console.error("Error:", error);
+      setMessages((prev) => {
+        const newMessages = [...prev];
+        const typingIndex = newMessages.findIndex((m) => m.isTyping);
+        if (typingIndex !== -1) {
+          newMessages[typingIndex] = {
+            sender: "bot",
+            text: "Sorry, there was an error processing your request.",
+          };
+        }
+        return newMessages;
+      });
+    }
 
-  setInput("");
-};
+    setInput("");
+  };
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -182,7 +200,6 @@ export default function Dashboard() {
           },
         }}
       >
-        <Toolbar />
         <Box sx={{ overflow: "auto" }}>
           <List>
             <ListItem button onClick={handleNewChat}>
@@ -202,8 +219,8 @@ export default function Dashboard() {
                 <ListItemIcon>
                   <ChatIcon />
                 </ListItemIcon>
-                <ListItemText 
-                  primary={`Chat ${chat.chat_session_id}`} 
+                <ListItemText
+                  primary={`Chat ${chat.chat_session_id}`}
                   secondary={new Date(chat.created_at).toLocaleDateString()}
                 />
               </ListItem>
@@ -217,14 +234,14 @@ export default function Dashboard() {
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              AI Tutor Home
+              Smart Python AI Tutor Using RAG
             </Typography>
 
-            <Typography variant="body1" component="div" sx={{ flexGrow: 1 }}>
-              RAG Chatbot
-            </Typography>
-
-            <Button color="inherit" onClick={() => handleLogout()}>
+            <Button
+              color="inherit"
+              variant="outlined"
+              onClick={() => handleLogout()}
+            >
               Logout
             </Button>
           </Toolbar>
@@ -255,46 +272,48 @@ export default function Dashboard() {
               }}
             >
               {messages.map((msg, idx) => (
-              <Box
-                key={idx}
-                sx={{
-                  display: "flex",
-                  justifyContent: msg.sender === "user" ? "flex-end" : "flex-start",
-                  mb: 2,
-                }}
-              >
-                <Paper
-                  elevation={1}
+                <Box
+                  key={idx}
                   sx={{
-                    p: 2,
-                    maxWidth: "80%",
-                    borderRadius: 3,
-                    bgcolor: msg.sender === "user" ? "primary.main" : "background.paper",
-                    color: msg.sender === "user" ? "white" : "text.primary",
-                    overflowX: "auto",   // 👈 restrict horizontal scroll to this bubble only
+                    display: "flex",
+                    justifyContent:
+                      msg.sender === "user" ? "flex-end" : "flex-start",
+                    mb: 2,
                   }}
                 >
-                  {msg.isTyping ? (
-                    <TypingIndicator />
-                  ) : (
-                    <Box
-                      sx={{
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                        overflowX: "auto",   // 👈 ensures code/table scrolls, not page
-                        maxWidth: "100%",
-                      }}
-                    >
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {msg.text}
-                      </ReactMarkdown>
-                    </Box>
-                  )}
-                </Paper>
-
-
-              </Box>
-            ))}
+                  <Paper
+                    elevation={1}
+                    sx={{
+                      p: 2,
+                      maxWidth: "80%",
+                      borderRadius: 3,
+                      bgcolor:
+                        msg.sender === "user"
+                          ? "primary.main"
+                          : "background.paper",
+                      color: msg.sender === "user" ? "white" : "text.primary",
+                      overflowX: "auto", // 👈 restrict horizontal scroll to this bubble only
+                    }}
+                  >
+                    {msg.isTyping ? (
+                      <TypingIndicator />
+                    ) : (
+                      <Box
+                        sx={{
+                          whiteSpace: "pre-wrap",
+                          wordBreak: "break-word",
+                          overflowX: "auto", // 👈 ensures code/table scrolls, not page
+                          maxWidth: "100%",
+                        }}
+                      >
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {msg.text}
+                        </ReactMarkdown>
+                      </Box>
+                    )}
+                  </Paper>
+                </Box>
+              ))}
 
               <div ref={messagesEndRef} />
             </Box>
@@ -317,9 +336,21 @@ export default function Dashboard() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
               />
-              <IconButton color="primary" onClick={handleSend} sx={{ ml: 1 }}>
-                Send
-              </IconButton>
+
+              <Button
+                variant="contained"
+                onClick={handleSend}
+                sx={{
+                  minWidth: 0,
+                  ml: 1,
+                  p: 1,
+                  borderRadius: "50%",
+                  height: "3.5rem",
+                  width: "3.5rem",
+                }}
+              >
+                <SendIcon />
+              </Button>
             </Box>
           </Box>
         </div>
