@@ -16,7 +16,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route element={<PrivateRoute />}>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/chat" element={<Dashboard />} />
             </Route>
             <Route path="*" element={<PageNotFound />} />
           </Routes>

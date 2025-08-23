@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { TextField, Box, Typography, Alert, Link } from "@mui/material";
 import Button from "@mui/material/Button";
-import login_bg from "../assets/backdrop.jpeg";
+import login_bg from "../assets/home.png";
 import { useAuth } from "../context/AuthContext";
 // import { Link as RouterLink } from "react-router-dom";
 
@@ -42,7 +42,7 @@ export default function Login() {
         severity: "success",
       });
       login(response.data);
-      navigate("/dashboard");
+      navigate("/chat");
     } catch (error) {
       setAlertData({
         isOpened: true,
@@ -68,7 +68,7 @@ export default function Login() {
         className="border-1  flex flex-col bg-white shadow  border-gray-300 rounded-2xl w-2/3 h-4/6"
       >
         <div className="flex h-full">
-          <div className="w-1/2 h-full bg-blue-200 rounded-2xl">
+          <div className="w-1/2 h-full bg-blue-200 rounded-l-2xl">
             <img
               src={login_bg}
               alt=""
