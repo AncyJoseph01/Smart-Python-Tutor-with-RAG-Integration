@@ -146,6 +146,7 @@ export default function Dashboard() {
           {
             chat_session_id: response.data.chat_session_id,
             created_at: new Date().toISOString(),
+            chat_query: response.data.query
           },
           ...prev,
         ]);
