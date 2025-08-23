@@ -6,6 +6,7 @@ from app.db.database import database
 from app.db.models import Chat, User
 from typing import List
 
+
 router = APIRouter()
 
 async def validate_user(user_id: int):
@@ -98,7 +99,10 @@ async def get_user_sessions(user_id: int, _=Depends(validate_user)):
         query = (
             select(
                 Chat.chat_session_id,
-                func.min(Chat.created_at).label('created_at')
+                func.min(Chat.created_at).label('created_at'),
+                func.min(Chat.query).label('query')
+                
+
             )
             .where(Chat.user_id == user_id)
             .group_by(Chat.chat_session_id)
@@ -109,7 +113,9 @@ async def get_user_sessions(user_id: int, _=Depends(validate_user)):
         return [
             ChatSessionInfo(
                 chat_session_id=session.chat_session_id,
-                created_at=session.created_at
+                created_at=session.created_at,
+                chat_query=session.query
+
             ) 
             for session in sessions
         ]

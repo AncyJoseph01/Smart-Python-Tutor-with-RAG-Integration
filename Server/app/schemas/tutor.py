@@ -32,6 +32,6 @@ class ChatHistory(BaseModel):
 class ChatSessionInfo(BaseModel):
     chat_session_id: int
     created_at: datetime
-
+    chat_query: str
     class Config:
         from_attributes = True
