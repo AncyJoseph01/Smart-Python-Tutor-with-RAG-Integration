@@ -1,11 +1,12 @@
 services:
   backend:
-    build: .
+    build: 
+      context: ./server
     container_name: tutor-backend
     ports:
       - "8000:8000"
     env_file:
-      - .env
+      - ./server/.env
     depends_on:
       - db
     entrypoint: ["/bin/sh", "-c", "export PYTHONPATH=/code && python /code/app/scripts/create_tables.py && uvicorn app.main:app --host 0.0.0.0 --port 8000"]
